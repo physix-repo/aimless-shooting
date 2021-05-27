@@ -1,8 +1,12 @@
-# In-house scripts for aimless shooting with GROMACS/Plumed
+# In-house scripts for aimless shooting with PLUMED and GROMACS or LAMMPS
+
+This is a bash implementation of the aimless shooting (AS) algorithm using either GROMACS or LAMMPS as the molecular dynamics engine, and PLUMED to compute collective variables. The original GROMACS version, from Alexandre Jedrecy, is a fixed-length AS implementation (`10.1063/1.2234477`), and the LAMMPS one (from Arthur France-Lanord) is a flexible-length AS algorithm (`10.1021/acs.jctc.5b00032`). 
+
+## GROMACS implementation
 
 Each script fills a "simple" task:
 
-"extractConfig.sh" allows you to divide an initial trajectory into a set of pdb files, depending on the delta t and maximum length chosen for the algorithm. In this script I merge together two different trajectory shooted from the same point, you will need to adapt it a bit if you have a single trajectory that connect your two states (in fact it should be simpler as you won't need to invert order of the frames to mimic time inversion)
+"extractConfig.sh" allows you to divide an initial trajectory into a set of pdb files, depending on the delta t and maximum length chosen for the algorithm. In this script I merge together two different trajectory shot from the same point, you will need to adapt it a bit if you have a single trajectory that connects your two states (in fact it should be simpler as you won't need to invert order of the frames to mimic time inversion)
 
 "launchJob.sh" allows you to launch several TPS runs in parallel, each in its dedicated folder with the relevant initial file needed. Here for instance the script will generate two sets of 10 independent TPS runs, with 0.1 ns or 0.2 ns as the time step. It take care to generate all needed external files
 
@@ -24,7 +28,7 @@ v[i][m] = sd\*normalDist(\*rng);   ------->   v[i][m] = -sd\*normalDist(\*rng);
 ```
 From this two tpr the script will propagate the trajectories by step of 5 ns, until both of them reach states basins or simulation have reached its maximum length. In the current script if a backward or forward trajectory reaches a basin, we stop to update it to gain some computational time. If you want that your two trajectories have the same length, you just need to remove some test on lines 184-201. 
 
-## Procedure example for aimless shooting
+### Procedure example for aimless shooting
 
 1. Select two trajectories shot from the same transition point that connect the two states (so for me one that connect liquid and one that connect ice), and use extractConfig.sh to cut the trajectories into pdb frames with predefined dt and max length for the trajectories.
 2. Then upload the generated directories on JeanZay, update launchJob.sh to have the correct name and dt, and just run launchJob.sh, commenting the part in where the jobs are submitted.
@@ -33,7 +37,21 @@ From this two tpr the script will propagate the trajectories by step of 5 ns, un
 
 It's generally a good idea to check regularly the status\_shooting\_\*.txt file to see if everything seems fine. Normally you should aim to have 10 to 20% of acceptance rates.
 
+## LAMMPS implementation
+
+Everything is built around the `AS_loop.sh` bash script, which submits a single job to Jean Zay. Simply run `sbatch AS_loop.sh` to launch the job. Variables that need to be set are: 
+* `as_step` the timestep of the AS algorithm, in MD timestep units
+* `max_iter` the total number of AS iterations
+* `lmp_data` full path to a LAMMPS data file similar to your system (used to deal with topological elements)
+* `ini_trj` full path to a first trajectory connecting both basins. The custom LAMMPS format should be `id type mol x y z vx vy vz ix iy iz` 
+* `ini_conf` snapshot number corresponding to an estimate of the transition state in `ini_conf`.
+
+The LAMMPS forward and backward propagation scripts are `in_fwd.lmp` and `in_bwd.lmp`. These files contain information about the temperature, bonded and non-bonded potentials, which you should edit according to your system, as well as settings related to SHAKE. The PLUMED script (`plumed.dat`) should be edited to match your CV and basin definition. It makes use of the `COMMITTOR` functionality, which automatically stops the MD run when one of the predefined basins is reached. 
+
+Accepted trajectories are stored in the `accepted_trj` directory, and coresponding CV values in the `accepted.cv` file. Some statistics are reported in the `statistics.txt` file, including the updated acceptance ratio. More features will be added incrementaly. The scripts are currently set to run an example aimless shooting on LiF in water, using path collective variables and a basin definition based on the interionic distance. 
+
 ## Contributors
 
 * Alexandre Jedrecy: alexandre.jedrecy@gmail.com
+* Arthur France-Lanord: arthur.flanord@gmail.com
 

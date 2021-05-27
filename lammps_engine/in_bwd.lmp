@@ -1,0 +1,73 @@
+# LAMMPS script for inner loop of aimless shooting
+# Backward time propagation
+# LiF in water
+
+units 			real
+boundary 		p p p
+
+atom_style 		full
+bond_style 		harmonic
+angle_style 	harmonic
+dihedral_style 	opls
+
+special_bonds 	lj/coul 0.0 0.0 0.5
+
+pair_style 		lj/cut/coul/long 6.0
+pair_modify 	mix arithmetic tail no
+
+kspace_style 	pppm 1.0e-5
+
+read_data 		MYDATA
+
+variable		sysvol		equal vol
+variable		sysmass		equal mass(all)/6.0221367e+23
+variable		sysdensity	equal v_sysmass/v_sysvol/1.0e-24
+variable		time		equal step*dt+0.000001
+variable		cella		equal lx
+variable		etotal		equal etotal
+variable		pe			equal pe
+variable		ke			equal ke
+
+pair_coeff 		1    1  0.000000     0.000000  # Hw Hw
+pair_coeff 		2    2  0.155425     3.165500  # Ow Ow
+pair_coeff 		3    3  0.336734     1.409000  # Li Li
+pair_coeff 		4    4  0.007401     4.022000  # F F
+
+neighbor 		2.0 bin
+neigh_modify 	delay 0 every 1 check yes
+
+timestep 		1.0
+
+# Read current configuration
+
+read_dump 		MYTRJ MYCONF x y z vx vy vz ix iy iz
+
+reset_timestep 	0
+
+# Groups
+
+group 			water type 1 2
+
+fix 			1 water shake 1.0e-5 100 0 b 1 a 1
+
+velocity     	all create 300.0 MYSEED dist gaussian mom yes rot yes
+
+# Run backward in time
+
+variable 		vx atom -vx
+variable 		vy atom -vy
+variable 		vz atom -vz
+
+velocity 		all set v_vx v_vy v_vz
+
+thermo_style	custom step v_time press temp pe ke etotal
+thermo 			MYSTEP
+fix				2 all nvt temp 300.0 300.0 100.0
+fix 			3 all plumed plumedfile plumed.dat outfile plumed.out
+dump 			trj all custom 1 nvt.lammpstrj id type mol q x y z vx vy vz ix iy iz
+dump_modify 	trj sort id
+run 			1000000
+unfix 			1
+unfix 			2
+unfix 			3
+undump 			trj

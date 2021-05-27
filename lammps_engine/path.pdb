@@ -1,0 +1,7 @@
+REMARK ARG=L1L2.lessthan,F2L2.lessthan,L1F2.lessthan,F2F2.lessthan,L1O2.lessthan,F2O2.lessthan,L1H2.lessthan,F2H2.lessthan L1L2.lessthan=0.0000 F2L2.lessthan=0.9820 L1F2.lessthan=0.9820 F2F2.lessthan=0.0000 L1O2.lessthan=1.7920 F2O2.lessthan=3.6060 L1H2.lessthan=7.0110 F2H2.lessthan=2.3300
+END
+REMARK ARG=L1L2.lessthan,F2L2.lessthan,L1F2.lessthan,F2F2.lessthan,L1O2.lessthan,F2O2.lessthan,L1H2.lessthan,F2H2.lessthan L1L2.lessthan=0.0000 F2L2.lessthan=0.4960 L1F2.lessthan=0.4960 F2F2.lessthan=0.0000 L1O2.lessthan=2.2610 F2O2.lessthan=3.7840 L1H2.lessthan=6.6080 F2H2.lessthan=3.0600
+END
+REMARK ARG=L1L2.lessthan,F2L2.lessthan,L1F2.lessthan,F2F2.lessthan,L1O2.lessthan,F2O2.lessthan,L1H2.lessthan,F2H2.lessthan L1L2.lessthan=0.0000 F2L2.lessthan=0.0020 L1F2.lessthan=0.0020 F2F2.lessthan=0.0000 L1O2.lessthan=2.2630 F2O2.lessthan=3.9580 L1H2.lessthan=6.3770 F2H2.lessthan=3.2040
+END
+

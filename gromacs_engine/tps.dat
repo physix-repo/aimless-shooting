@@ -1,0 +1,19 @@
+PIVcom ...
+  LABEL=piv
+  VOLUME=125.1264
+  UPDATEPIV=50000
+  REF_FILE1=../daint_input/liq-4096-230K.pdb
+  REF_FILE2=../daint_input/Ih-4096.pdb
+  ATOMTYPES=OW1
+  SFACTOR=1.
+  SERIAL
+  SORT=1
+  SWITCH1={RATIONAL R_0=0.7 MM=12 NN=4}
+  NL_CUTOFF=2.0
+  NL_STRIDE=10
+  NL_SKIN=0.1
+... PIVcom
+
+p1: FUNCPATHMSD ARG=piv.d1,piv.d2 LAMBDA=0.15
+
+PRINT ARG=p1.s,p1.z,piv.d1,piv.d2 STRIDE=50000 FILE=colvar/cv_name_holder FMT=%15.6f
