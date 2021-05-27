@@ -44,7 +44,7 @@ Everything is built around the `AS_loop.sh` bash script, which submits a single 
 * `max_iter` the total number of AS iterations
 * `lmp_data` full path to a LAMMPS data file similar to your system (used to deal with topological elements)
 * `ini_trj` full path to a first trajectory connecting both basins. The custom LAMMPS format should be `id type mol x y z vx vy vz ix iy iz` 
-* `ini_conf` snapshot number corresponding to an estimate of the transition state in `ini_conf`.
+* `ini_conf` snapshot number corresponding to an estimate of the transition state in `ini_trj`.
 
 The LAMMPS forward and backward propagation scripts are `in_fwd.lmp` and `in_bwd.lmp`. These files contain information about the temperature, bonded and non-bonded potentials, which you should edit according to your system, as well as settings related to SHAKE. The PLUMED script (`plumed.dat`) should be edited to match your CV and basin definition. It makes use of the `COMMITTOR` functionality, which automatically stops the MD run when one of the predefined basins is reached. 
 
